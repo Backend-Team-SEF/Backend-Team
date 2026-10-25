@@ -19,10 +19,6 @@ const registerationScema = joi.object({
         }),
     phone: joi.string().required().regex(/^01\d{9}$/),
     avatar: joi.string(),
-    role: joi.string(),
-    isVerified: joi.boolean(),
-    resetPasswordToken: joi.string(),
-    resetPasswordExpire: joi.date(),
 })
 
 const loginSchema = joi.object({
