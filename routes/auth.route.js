@@ -7,4 +7,8 @@ router.post("/login", login, authController.login)
 router.post("/logout", authController.logout)
 
 
+const { authintication } = require("../middleware/authintication.middleware")
+const userController = require("../controllers/user.controller")
+router.get("/me", authintication, userController.getMe)
+
 module.exports = router
