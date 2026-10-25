@@ -286,7 +286,7 @@ const productController = {
             }
 
             const isOwner = review.user.equals(req.user._id)
-            const isAdmin = req.user.role === "Admin"
+            const isAdmin = req.user.role === "Admin" || req.user.role === "admin"
 
             if (!isOwner && !isAdmin) {
                 return res.status(403).send({ message: "You can only delete your own review" })
