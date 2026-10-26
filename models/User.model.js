@@ -3,13 +3,13 @@ const bcrypt = require("bcryptjs")
 
 userSchema = mongoose.Schema({
     username: {required: true, trim: true, type: String },
-    email: { required: true,trim: true,type: String, unique: true},
+    email: { required: true,trim: true,type: String, unique: true,lowercase : true},
     password: {required: true,trim: true,type: String,minlength: 8},
     phone: {type: String},
     avatar:{ type: String},
     role: {type: String , enum: ["Admin", "customer"], default: "customer"},
     address:[{type: String}],
-    //wishlist:{type: mongoose.Schema.Types.ObjectId }, ref : Product} ,
+    wishlist:{type: mongoose.Schema.Types.ObjectId , ref : Product} ,
     isVerified: {type: Boolean,default: false},
     resetPasswordToken: {type: String },
     resetPasswordExpire: {type: Date },
@@ -27,5 +27,8 @@ userSchema.pre("save", async function () {
         e.message
     }}) 
 
+    userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 const User = mongoose.model("users", userSchema)
 module.exports = User
