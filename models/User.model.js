@@ -9,7 +9,7 @@ userSchema = mongoose.Schema({
     avatar:{ type: String},
     role: {type: String , enum: ["Admin", "customer"], default: "customer"},
     address:[{type: String}],
-    wishlist:{type: mongoose.Schema.Types.ObjectId , ref : Product} ,
+    wishlist:{type: mongoose.Schema.Types.ObjectId , ref : "Product"} ,
     isVerified: {type: Boolean,default: false},
     resetPasswordToken: {type: String },
     resetPasswordExpire: {type: Date },
@@ -30,5 +30,5 @@ userSchema.pre("save", async function () {
     userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
-const User = mongoose.model("users", userSchema)
+const User = mongoose.model("User", userSchema)
 module.exports = User
