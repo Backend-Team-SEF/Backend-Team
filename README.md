@@ -121,3 +121,82 @@ EMAIL_PASS=your_app_password
 
 ## Deployment
 Deployed on Vercel with MongoDB Atlas (Network Access set to allow all, since Vercel's outgoing IPs aren't static).
+
+### Orders API
+
+This module handles customer orders in the e-commerce backend.
+
+### Features
+
+- Create a new order.
+- Retrieve all orders for the authenticated user.
+- Retrieve a specific order by ID.
+- Cancel a pending order.
+- Automatically calculate subtotal, shipping fees, tax, and total price.
+- Track order status and payment status.
+
+### API Endpoints
+
+All endpoints use the `/api/orders` base path.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/orders` | Create a new order |
+| GET | `/api/orders/my-orders` | Get the current user's orders |
+| GET | `/api/orders/:id` | Get a specific order |
+| PATCH | `/api/orders/:id/cancel` | Cancel a pending order |
+
+### Authentication
+
+All order endpoints require authentication. Log in first and ensure the `access_token` cookie is sent with the request.
+
+### Create an Order
+
+**Request**
+
+`POST /api/orders`
+
+**Request Body**
+
+```json
+{
+  "items": [
+    {
+      "name": "Test Product",
+      "price": 500,
+      "quantity": 2,
+      "image": ""
+    }
+  ],
+  "shippingAddress": {
+    "fullName": "Ahmed Mohamed",
+    "phone": "01123456789",
+    "address": "Street 10",
+    "city": "Mansoura"
+  },
+  "paymentMethod": "cash",
+  "customerNote": "Please handle with care"
+}
+```
+
+The backend calculates the subtotal and order total automatically.
+
+### Order Statuses
+
+- `pending`
+- `confirmed`
+- `processing`
+- `shipped`
+- `delivered`
+- `cancelled`
+
+### Payment Statuses
+
+- `pending`
+- `paid`
+- `failed`
+- `refunded`
+
+### Testing
+
+Use Postman to test the endpoints. Make sure the server is running, the database is connected, and the user is authenticated before creating or retrieving orders.

@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-﻿node_modules/
-.env
-=======
 node_modules/
->>>>>>> omar
+.env
+.env.*
+!.env.example

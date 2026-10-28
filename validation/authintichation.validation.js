@@ -1,6 +1,4 @@
-const joi = require("joi")
-
-
+import joi from "joi";
 const registerationScema = joi.object({
     username: joi.string().trim(),
     email: joi.string().email().required(),
@@ -23,7 +21,7 @@ const registerationScema = joi.object({
     isVerified: joi.boolean(),
     resetPasswordToken: joi.string(),
     resetPasswordExpire: joi.date(),
-})
+});
 
 const loginSchema = joi.object({
     email: joi.string().email(),
@@ -40,11 +38,5 @@ const loginSchema = joi.object({
             "string.max":
                 "Password must not exceed 30 characters"
         }),
-})
-
-
-
-module.exports = {
-    registerationScema,
-    loginSchema
-}
+});
+export { registerationScema, loginSchema };

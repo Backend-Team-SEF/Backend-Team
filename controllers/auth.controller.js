@@ -1,58 +1,94 @@
-const User = require("../models/User.model")
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
-
+import User from "../models/User.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 const authController = {
     register: async (req, res) => {
         try {
-            const checkemail = await User.findOne({ email: req.body.email })
-            if (checkemail) {
-                return res.status(409).send({ message: "Email is belonging to anthor user " })
-            }
-            const user = new User(req.body)
-            await user.save()
-            res.status(201).send({ message: "Account Created Successfully !!" })
-        }
-        catch (err) {
-            res.send(err)
-        }
+            const { username, email, password, phone, avatar } = req.body;
 
-    },
-    login: async (req, res) => {
-        try {
-            const user = await User.findOne({ email: req.body.email })
-            if (!user) {
-                return res.status(401).send("You Entered Wrong E-mail")
+            const checkEmail = await User.findOne({ email });
+            if (checkEmail) {
+                return res.status(409).send({
+                    message: "Email already belongs to another user"
+                });
             }
-            const isMatch = await bcrypt.compare(req.body.password, user.password)
-            if (!isMatch) {
-                return res.status(401).send("You Entered Wrong Password")
-            }
-            const secritKey = process.env.SECRET_KEY
-            const token = await jwt.sign({ id: user._id }, secritKey) //////////Creation of Token 
-            res.cookie("access_token", `Berear ${token}`, {
-                maxAge: 1000 * 60 * 60 * 24 * 2,
-                httpOnly: true,
-            })
-            user.tokens.push(token)
-            user.save()
-            res.status(202).send({ message: "you Are Welcome" })
-
+            const user = new User({
+                username,
+                email,
+                password,
+                phone,
+                avatar
+            });
+            await user.save();
+            return res.status(201).send({
+                message: "Account created successfully"
+            });
         } catch (error) {
             return res.status(500).send({
-                message: error.message
+                message: "Failed to create account"
+            });
+        }
+    },
+
+    login: async (req, res) => {
+        try {
+            const { email, password } = req.body;
+
+            const user = await User.findOne({ email });
+
+            if (!user) {
+                return res.status(401).send({
+                    message: "Invalid email or password"
+                });
+            }
+
+            const isMatch = await bcrypt.compare(password, user.password);
+
+            if (!isMatch) {
+                return res.status(401).send({
+                    message: "Invalid email or password"
+                });
+            }
+
+            const secretKey = process.env.SECRET_KEY;
+
+            if (!secretKey) {
+                throw new Error("SECRET_KEY is not configured");
+            }
+            const token = jwt.sign(
+                { id: user._id },
+                secretKey,
+                { expiresIn: "2d" }
+            );
+            res.cookie("access_token", `Bearer ${token}`, {
+                maxAge: 1000 * 60 * 60 * 24 * 2,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax"
+            });
+            user.tokens.push(token);
+            await user.save();
+            return res.status(200).send({
+                message: "Login successful"
+            });
+        } catch (error) {
+            console.error("Login Error:", error)
+            return res.status(500).send({
+                message: "Internal server error"
             });
         }
     },
     logout: async (req, res) => {
         try {
-            res.cookie("access_token", " ", { maxAge: 0 })
-            res.status(202).send({ message: "logout Successfully" })
+            res.clearCookie("access_token");
+            return res.status(200).send({
+                message: "Logout successful"
+            });
         } catch (error) {
-            logger.error(error.message)
-            res.status(500).send({ message: error.message })
+            return res.status(500).send({
+                message: "Logout failed"
+            });
         }
     }
-}
-
-module.exports = authController
+};
+export default authController;

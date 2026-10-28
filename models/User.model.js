@@ -1,31 +1,55 @@
-const mongoose = require("mongoose")
-const bcrypt = require("bcryptjs")
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+const userSchema = new mongoose.Schema({
+    username: {
+        required: true,
+        trim: true,
+        type: String
+    },
+     email: {
+        required: true,
+        trim: true,
+        type: String,
+        unique: true
+    },
+    password: {
+        required: true,
+        trim: true,
+        type: String,
+        minlength: 8
+    },
+        phone: {
+        type: String
+    },
+         avatar: {
+        type: String
+    },
+        role: {
+        type: String,
+        enum: ["Admin", "customer"],
+        default: "customer"
+    },
+     address: [{ type: String }],
+         isVerified: {
+        type: Boolean,
+        default: false
+    },
+         resetPasswordToken: {
+        type: String
+    },
 
-userSchema = mongoose.Schema({
-    username: {required: true, trim: true, type: String },
-    email: { required: true,trim: true,type: String, unique: true},
-    password: {required: true,trim: true,type: String,minlength: 8},
-    phone: {type: String},
-    avatar:{ type: String},
-    role: {type: String , enum: ["Admin", "customer"], default: "customer"},
-    address:[{type: String}],
-    //wishlist:{type: mongoose.Schema.Types.ObjectId }, ref : Product} ,
-    isVerified: {type: Boolean,default: false},
-    resetPasswordToken: {type: String },
-    resetPasswordExpire: {type: Date },
-    tokens: [{required: true,type: String, trim: true, expires: "2d"}]
-    })
-    
+    resetPasswordExpire: {
+        type: Date
+    },
+
+    tokens: [{
+        type: String,
+        trim: true
+    }]
+});
 userSchema.pre("save", async function () {
-    try {
-        const user = this
-        if (user.isModified("password")) {
-            user.password = await bcrypt.hash(user.password, 8)
-        }
-    }
-    catch (e) {
-        e.message
-    }}) 
-
-const User = mongoose.model("users", userSchema)
-module.exports = User
+    if (!this.isModified("password")) return;
+    this.password = await bcrypt.hash(this.password, 8);
+});
+const User = mongoose.model("User", userSchema);
+export default User;
