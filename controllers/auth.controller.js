@@ -1,4 +1,4 @@
-const User = require("../models/User.model")
+const User = require("../models/user.model")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
@@ -36,7 +36,7 @@ const authController = {
             })
             user.tokens.push(token)
             await user.save()
-            res.status(202).send({ message: "you Are Welcome" })
+            res.status(202).send({ message: "you Are Welcome",token })
 
         } catch (error) {
             return res.status(500).send({
